@@ -13,9 +13,5 @@ class Server:
         return self.__app
 
     @staticmethod
-    def __register_events(app):
-        pass
-
-    @staticmethod
     def __register_routes(app):
         __routes__.register_routes(app)
