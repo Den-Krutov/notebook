@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator, ValidationError, Field
+from pydantic import BaseModel, field_validator, Field
 import phonenumbers
 
 from app.pkg.redis_tools.tools import RedisTools
@@ -20,7 +20,7 @@ class Organization(BaseModel):
     def check_phone(cls, value):
         phone = phonenumbers.parse(value, REGION)
         if not phonenumbers.is_valid_number_for_region(phone, REGION):
-            raise ValidationError('Несуществующий номер телефона')
+            raise ValueError('Несуществующий номер телефона')
         return value
 
     @classmethod

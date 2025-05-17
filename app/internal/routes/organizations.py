@@ -1,5 +1,4 @@
-from fastapi import APIRouter
-from pydantic import ValidationError
+from fastapi import APIRouter, HTTPException
 
 from app.internal.schemas.organizations import Organization
 
@@ -18,18 +17,13 @@ def check_organization(phone: str) -> Organization:
     '''
     try:
         organization = Organization.get(phone=phone)
-    except ValidationError as e:
-        return {
-            'error': e.errors()[0].msg,
-        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404, detail=e.errors()[0]['msg'].split(', ')[1])
     except KeyError as e:
-        return {
-            'error': str(e),
-        }
-    return {
-        'phone': organization.phone,
-        'address': organization.address,
-    }
+        raise HTTPException(
+            status_code=404, detail=str(e).replace("'", ""))
+    return organization
 
 
 @router.post('/write_data')
