@@ -35,5 +35,10 @@ def write_or_overwrite_organization(
 
     Принимает в body номер телефона и адрес.
     '''
-    organization.save()
+    try:
+        organization = Organization.save(
+            organization.phone, organization.address)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404, detail=e.errors()[0]['msg'].split(', ')[1])
     return organization

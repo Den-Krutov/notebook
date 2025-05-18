@@ -17,14 +17,14 @@ class Organization(BaseModel):
     address: str = Field(default='', max_length=50)
 
     @field_validator('phone')
-    def check_phone(cls, value):
+    def check_phone(cls, value: str) -> str:
         phone = phonenumbers.parse(value, REGION)
         if not phonenumbers.is_valid_number_for_region(phone, REGION):
             raise ValueError('Несуществующий номер телефона')
         return value
 
     @classmethod
-    def get(cls, phone) -> 'Organization':
+    def get(cls, phone: str) -> 'Organization':
         organization = Organization(phone=phone)
 
         address = RedisTools.get_pair(organization.phone)
@@ -33,5 +33,8 @@ class Organization(BaseModel):
         organization.address = address
         return organization
 
-    def save(self):
-        RedisTools.write_pair(self.phone, self.address)
+    @classmethod
+    def save(cls, phone: str, address: str):
+        organization = Organization(phone=phone, address=address)
+        RedisTools.write_pair(phone, address)
+        return organization
